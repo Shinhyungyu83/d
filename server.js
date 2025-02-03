@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const fetch = require("node-fetch");
+const axios = require("axios");
 
 const app = express();
 const PORT = process.env.PORT || 3000; // Render는 자동으로 포트 할당
@@ -12,9 +12,16 @@ app.use(cors());
 app.get("/api/sheet", async (req, res) => {
     try {
         const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSh9swdx4Mh0TlTcJGcZJibM8-Y7mFKjgxOopvrCVuQ-pvagWgwbLpJeBzVKM5mlpLstZwsFtQ4hIFY/pub?gid=499769709&single=true&output=csv";
-        const response = await fetch(sheetUrl);
-        const data = await response.text();
-        res.send(data);
+        
+        // `node-fetch` 대신 `axios` 사용 (더 안정적)
+        const response = await axios.get(sheetUrl, {
+            headers: { "Content-Type": "text/csv" }, 
+            responseType: "text"
+        });
+
+        // 응답을 그대로 클라이언트에게 전달
+        res.setHeader("Content-Type", "text/csv");  
+        res.send(response.data);
     } catch (error) {
         console.error("Error fetching Google Sheet:", error);
         res.status(500).json({ error: "Failed to fetch data" });
