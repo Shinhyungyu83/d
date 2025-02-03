@@ -11,7 +11,7 @@ app.use(cors());
 // Google Sheet 데이터를 가져오는 API 엔드포인트
 app.get("/api/sheet", async (req, res) => {
     try {
-        const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSh9swdx4Mh0TlTcJGcZJibM8-Y7mFKjgxOopvrCVuQ-pvagWgwbLpJeBzVKM5mlpLstZwsFtQ4hIFY/pub?gid=499769709&single=true&output=csv";
+        const sheetUrl = "https://script.google.com/macros/s/AKfycbxBKLojXApu26Sn8DjBQWGY8W7HB6nL0B0C2hZJ6qdFBvVvMWbiosaCbJUIV4N1CKxg/exec";
         
         // `node-fetch` 대신 `axios` 사용 (더 안정적)
         const response = await axios.get(sheetUrl, {
