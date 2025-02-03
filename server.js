@@ -3,12 +3,12 @@ const cors = require("cors");
 const fetch = require("node-fetch");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // Render는 자동으로 포트 할당
 
 // CORS 허용 설정
 app.use(cors());
 
-// Google Sheet 데이터 가져오는 API
+// Google Sheet 데이터를 가져오는 API 엔드포인트
 app.get("/api/sheet", async (req, res) => {
     try {
         const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSh9swdx4Mh0TlTcJGcZJibM8-Y7mFKjgxOopvrCVuQ-pvagWgwbLpJeBzVKM5mlpLstZwsFtQ4hIFY/pub?gid=499769709&single=true&output=csv";
@@ -23,5 +23,5 @@ app.get("/api/sheet", async (req, res) => {
 
 // 서버 실행
 app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
+    console.log(`✅ Server is running on port ${PORT}`);
 });
