@@ -1,34 +1,34 @@
 const express = require("express");
-const cors = require("cors");
 const axios = require("axios");
+const cors = require("cors");
 
 const app = express();
-const PORT = process.env.PORT || 3000; // Render는 자동으로 포트 할당
+const PORT = 3000;
 
-// CORS 허용 설정
+// CORS 설정
 app.use(cors());
+app.use(express.json());
 
-// Google Sheet 데이터를 가져오는 API 엔드포인트
-app.get("/api/sheet", async (req, res) => {
-    try {
-        const sheetUrl = "https://script.google.com/macros/s/AKfycbxBKLojXApu26Sn8DjBQWGY8W7HB6nL0B0C2hZJ6qdFBvVvMWbiosaCbJUIV4N1CKxg/exec";
-        
-        // `node-fetch` 대신 `axios` 사용 (더 안정적)
-        const response = await axios.get(sheetUrl, {
-            headers: { "Content-Type": "text/csv" }, 
-            responseType: "text"
-        });
+// Google Apps Script API URL
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyc2tFfAyK4q6uhkBElXN3NL0cMF6GY8cdso5QN4U9HKjxb4YxOaV6ZP_N4s_4DijAF/exec";
 
-        // 응답을 그대로 클라이언트에게 전달
-        res.setHeader("Content-Type", "text/csv");  
-        res.send(response.data);
-    } catch (error) {
-        console.error("Error fetching Google Sheet:", error);
-        res.status(500).json({ error: "Failed to fetch data" });
+// 프록시 엔드포인트
+app.get("/api/data", async (req, res) => {
+  try {
+    const { name, rrn } = req.query;
+
+    if (!name || !rrn) {
+      return res.status(400).json({ error: "이름과 주민번호 앞 6자리를 입력하세요." });
     }
+
+    const response = await axios.get(`${GOOGLE_SCRIPT_URL}?name=${encodeURIComponent(name)}&rrn=${encodeURIComponent(rrn)}`);
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: "데이터를 가져오는 중 오류 발생", details: error.message });
+  }
 });
 
 // 서버 실행
 app.listen(PORT, () => {
-    console.log(`✅ Server is running on port ${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });
