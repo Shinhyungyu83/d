@@ -1,14 +1,19 @@
+require("dotenv").config(); // 환경 변수 파일 로드
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
 
 const app = express();
-const PORT = process.env.PORT || 3000; // 환경 변수에서 포트 가져오기
+const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+const corsOptions = {
+  origin: "*", // 모든 도메인 허용 (Readers Hub 환경에서는 필요)
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
-const GOOGLE_SCRIPT_URL = process.env.GOOGLE_SCRIPT_URL; // 환경 변수에서 URL 가져오기
+const GOOGLE_SCRIPT_URL = process.env.GOOGLE_SCRIPT_URL; // 환경 변수에서 Google Apps Script URL 가져오기
 
 app.get("/api/data", async (req, res) => {
   const { name, rrn } = req.query;
@@ -22,7 +27,9 @@ app.get("/api/data", async (req, res) => {
   }
 
   try {
-    const response = await axios.get(`${GOOGLE_SCRIPT_URL}?name=${name}&rrn=${rrn}`);
+    const response = await axios.get(
+      `${GOOGLE_SCRIPT_URL}?name=${name}&rrn=${rrn}`
+    );
     res.json(response.data);
   } catch (error) {
     console.error("데이터 가져오기 오류:", error);
@@ -32,9 +39,15 @@ app.get("/api/data", async (req, res) => {
         details: error.response.data,
       });
     } else if (error.request) {
-      res.status(500).json({ error: "데이터를 가져오는 중 오류 발생", details: "서버에 연결할 수 없습니다." });
+      res.status(500).json({
+        error: "데이터를 가져오는 중 오류 발생",
+        details: "서버에 연결할 수 없습니다.",
+      });
     } else {
-      res.status(500).json({ error: "데이터를 가져오는 중 오류 발생", details: error.message });
+      res.status(500).json({
+        error: "데이터를 가져오는 중 오류 발생",
+        details: error.message,
+      });
     }
   }
 });
